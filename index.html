@@ -1,0 +1,553 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Grilles"><meta name="theme-color" content="#16202E">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"><link rel="icon" href="icon-192.png">
+</head><body><title>Grilles et tests</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Même mise en page que l'appli Veille : barre fixe (retour, recherche) ; accueil = accès direct, 4 portes, favoris ; document = fil d'Ariane, L'essentiel ouvert, Le détail en sections dépliables (une par ligne de grille) */
+:root{
+  --bg:#F4F5F7; --panel:#FFFFFF; --ink:#16202E; --mute:#5D6675; --line:#D9DDE3; --soft:#ECEFF3; --mark:#FFE58A;
+  --p1:#B83280; --p2:#2B6CB0; --p3:#0F766E; --p4:#8A5A00; --acc:#16202E;
+  --pp:#C2410C; --ge:#1D4ED8; --de:#0F766E;
+  --p5:#4A5568; --n1:#B42318; --n2:#A15C00; --n3:#15803D; --n4:#6D3FC0; --n1s:#FDECEA; --n2s:#FFF3DC; --n3s:#E6F5EA; --n4s:#EFE8FB;
+  --ui:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --read:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --fs:17px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10141B; --panel:#181E28; --ink:#E6EAF0; --mute:#9AA4B3; --line:#2B3442; --soft:#212938; --mark:#6B5A12;
+  --p1:#F27AB8; --p2:#7FB2F0; --p3:#3CC7B2; --p4:#E2B85A; --acc:#E6EAF0; --pp:#F08A4B; --ge:#86A8FF; --de:#3CC7B2; --p5:#C3CCD8; --n1:#F2786A; --n2:#F0B14A; --n3:#5BD08A; --n4:#B79CF5; --n1s:#3A1F1C; --n2s:#3A2C12; --n3s:#183326; --n4s:#2A2140; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10141B; --panel:#181E28; --ink:#E6EAF0; --mute:#9AA4B3; --line:#2B3442; --soft:#212938; --mark:#6B5A12;
+  --p1:#F27AB8; --p2:#7FB2F0; --p3:#3CC7B2; --p4:#E2B85A; --acc:#E6EAF0; --pp:#F08A4B; --ge:#86A8FF; --de:#3CC7B2; --p5:#C3CCD8; --n1:#F2786A; --n2:#F0B14A; --n3:#5BD08A; --n4:#B79CF5; --n1s:#3A1F1C; --n2s:#3A2C12; --n3s:#183326; --n4s:#2A2140; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:15px;line-height:1.45;margin:0;-webkit-tap-highlight-color:transparent}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:var(--ink)}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.topin{max-width:1100px;margin:0 auto;padding-block:8px;padding-inline:16px;display:flex;gap:8px;align-items:center}
+.ib{min-width:40px;min-height:40px;border:1px solid var(--line);background:var(--panel);border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-weight:600;padding:0 10px;white-space:nowrap}
+.brand{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:.01em;white-space:nowrap;text-decoration:none}
+.sbox{flex:1;min-width:0;position:relative}
+.sbox input{width:100%;min-height:40px;border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:0 12px 0 34px}
+.sbox svg{position:absolute;left:10px;top:11px;width:18px;height:18px;stroke:var(--mute)}
+main{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:16px 60px}
+h1{font-family:var(--display);font-weight:700;font-size:30px;line-height:1.1;margin:0;text-wrap:balance}
+.lead{color:var(--mute);margin:4px 0 0}
+.sec{margin-top:22px}
+.sec>h2{font-family:var(--display);font-size:21px;font-weight:700;margin:0 0 8px}
+.doors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:640px){.doors{grid-template-columns:minmax(0,1fr)}}
+.door{display:flex;flex-direction:column;gap:6px;text-decoration:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;border-top:4px solid var(--pc)}
+.door b{font-family:var(--display);font-size:24px;color:var(--pc);line-height:1.1}
+.door span{color:var(--mute);font-size:14px}
+.door small{color:var(--mute);font-size:12.5px}
+.quick{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.f{display:flex;flex-direction:column;gap:3px;min-width:0}
+.f label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+.f select{min-height:40px;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:0 8px;max-width:100%}
+.go{min-height:40px;border-radius:8px;border:none;background:var(--ink);color:var(--bg);font-weight:600;padding:0 16px}
+.list{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.li{display:grid;grid-template-columns:84px minmax(0,1fr);gap:10px;padding:10px 14px;text-decoration:none;border-top:1px solid var(--line);align-items:baseline}
+.li:first-child{border-top:none}
+.li .code{font-variant-numeric:tabular-nums;color:var(--mute);font-size:13px}
+.li .tt{font-size:15px}
+.li .tt small{display:block;color:var(--mute);font-size:12.5px;margin-top:1px}
+.fold{margin-top:12px}
+.fold>h3{font-family:var(--display);font-size:19px;margin:16px 0 6px;color:var(--pc)}
+.crumb{font-size:13px;color:var(--mute);display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center}
+.crumb a{text-decoration:none;color:var(--pc);font-weight:600}
+.dochead{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:flex-start;margin-top:6px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.star[aria-pressed=true]{color:#B7791F;border-color:#B7791F}
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-top:14px;font-size:14px}
+.toc b{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+.toc ol{margin:6px 0 0;padding-left:18px;columns:2;column-gap:28px}
+@media (max-width:640px){.toc ol{columns:1}}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+.doc{font-family:var(--read);font-size:var(--fs);line-height:1.6;margin-top:10px}
+.doc p,.doc li{max-width:72ch}
+.doc h2{font-family:var(--display);font-size:1.35em;letter-spacing:.04em;margin:26px 0 8px;color:var(--pc)}
+.doc .ess{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--pc);border-radius:10px;padding:4px 18px 10px}
+.doc .ess h2{margin-top:12px}
+.doc details{border-top:1px solid var(--line);padding:2px 0}
+.doc summary{font-family:var(--ui);font-weight:600;font-size:1.02em;padding:10px 0;cursor:pointer;list-style:none;display:flex;gap:10px;align-items:baseline}
+.doc summary::-webkit-details-marker{display:none}
+.doc summary::before{content:"+";display:inline-block;width:1em;color:var(--pc);font-weight:700}
+.doc details[open]>summary::before{content:"–"}
+.doc h4{font-family:var(--ui);font-size:.98em;margin:16px 0 4px;color:var(--pc)}
+.doc h5,.doc h6{font-family:var(--ui);font-size:.92em;margin:12px 0 4px}
+.tw{overflow-x:auto;margin:10px 0;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.doc table{border-collapse:collapse;font-family:var(--ui);font-size:.82em;line-height:1.4;min-width:100%}
+.doc th,.doc td{border-bottom:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+.doc th{background:var(--soft);font-weight:600}
+.doc blockquote{margin:10px 0;padding:6px 14px;border-left:3px solid var(--line);color:var(--mute)}
+.ref{color:var(--pc);font-weight:600;text-decoration:none;border-bottom:1px dotted currentColor}
+.bq,.ex{font-family:var(--ui);font-size:.82em;background:var(--soft);border-radius:5px;padding:1px 5px;white-space:nowrap}
+mark{background:var(--mark);color:inherit;border-radius:2px}
+.doc th.n1,.doc td.n1{background:var(--n1s);color:var(--n1)} .doc th.n2,.doc td.n2{background:var(--n2s);color:var(--n2)}
+.doc th.n3,.doc td.n3{background:var(--n3s);color:var(--n3)} .doc th.n4,.doc td.n4{background:var(--n4s);color:var(--n4)}
+.doc td.n1,.doc td.n2,.doc td.n3,.doc td.n4{white-space:nowrap}
+.doc tr.off td{color:var(--mute)}
+.doc small{color:var(--mute);font-size:.86em}
+.doc .att{background:var(--n3s);border:1px solid var(--n3);border-radius:10px;padding:8px 14px;margin:10px 0}
+.doc .att b{font-family:var(--ui);color:var(--n3);font-size:.85em;letter-spacing:.04em;text-transform:uppercase}
+.doc .att p{margin:4px 0 2px}
+.jump{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.jump a{font-size:13.5px;font-weight:600;text-decoration:none;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 12px}
+.jump a.on{background:var(--pc);border-color:var(--pc);color:#fff}
+.inp{min-height:40px;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:0 10px;max-width:100%}
+details.jg{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-top:10px;border-top:4px solid var(--pc)}
+details.jg>summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-family:var(--display);font-size:20px;font-weight:700;color:var(--pc)}
+details.jg>summary::-webkit-details-marker{display:none}
+details.jg .jm{font-family:var(--ui);font-size:13.5px;font-weight:600;color:var(--mute);align-self:center}
+.jgrid{display:grid;gap:10px;padding:0 12px 12px}
+@media(min-width:820px){.jgrid{grid-template-columns:220px minmax(0,1fr);align-items:start}}
+.jrad{max-width:240px;margin:0 auto;color:var(--ink)} .rad{width:100%;display:block}
+table.jt{border-collapse:collapse;width:100%;font-size:14px}
+table.jt th,table.jt td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}
+table.jt th{background:var(--soft);font-weight:600;font-size:12.5px}
+table.jt td.c{text-align:center;vertical-align:middle}
+table.jt tr.off td{color:var(--mute)}
+.lvtxt{font-size:12.5px;color:var(--mute);margin-top:3px;line-height:1.35}
+.lvsel{min-height:38px;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:0 6px;font-weight:600;max-width:190px}
+.lvsel.n1,.lvb.n1{background:var(--n1s);color:var(--n1);border-color:var(--n1)} .lvsel.n2,.lvb.n2{background:var(--n2s);color:var(--n2);border-color:var(--n2)}
+.lvsel.n3,.lvb.n3{background:var(--n3s);color:var(--n3);border-color:var(--n3)} .lvsel.n4,.lvb.n4{background:var(--n4s);color:var(--n4);border-color:var(--n4)}
+@media(max-width:600px){.lvsel{max-width:104px;font-size:13px} table.jt th,table.jt td{padding:7px 5px} table.jt{font-size:13.5px} .jgrid{padding:0 8px 10px}}
+.lvb{display:inline-block;min-width:34px;padding:3px 8px;border-radius:7px;border:1px solid;font-weight:700;text-align:center}
+.pk{padding:10px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;font-size:14.5px}
+.pk:first-child{border-top:none}
+.pk label{display:flex;gap:8px;align-items:center}
+.pk input{width:20px;height:20px}
+.ms{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--mute);margin-bottom:4px}
+.ms .inp{width:110px;font-size:16px;color:var(--ink)}
+.lines{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.lines a{font-size:13px;text-decoration:none;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:5px 9px}
+.doc details,.doc h4,.doc h5,.doc tr,.doc mark{scroll-margin-top:78px}
+.flash{animation:fl 1.6s ease}
+@keyframes fl{0%{background:var(--mark)}100%{background:transparent}}
+@media (prefers-reduced-motion: reduce){.flash{animation:none}}
+.pn{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:26px}
+.pn a{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;text-decoration:none;font-size:14px}
+.pn a small{display:block;color:var(--mute);font-size:12px}
+.pn a.nx{text-align:right}
+.notes{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.notes textarea{width:100%;min-height:90px;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--bg);resize:vertical}
+.res{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-decoration:none;display:block}
+.res+.res{margin-top:8px}
+.res .t{font-weight:600}
+.res .w{color:var(--mute);font-size:12.5px}
+.res .s{font-family:var(--read);font-size:14.5px;margin-top:4px;color:var(--ink)}
+.empty{color:var(--mute);padding:14px;background:var(--panel);border:1px dashed var(--line);border-radius:12px}
+.tools{display:flex;flex-wrap:wrap;gap:8px}
+.msg{font-size:13.5px;color:var(--mute)}
+.load{padding:40px 0;color:var(--mute)}
+</style>
+
+<header class="top"><div class="topin">
+  <button class="ib" id="back" type="button" aria-label="Retour">‹</button>
+  <a class="brand" href="#">Grilles</a>
+  <div class="sbox"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="Rechercher dans les grilles et les tests" autocomplete="off" enterkeyhint="search"></div>
+</div></header>
+<main id="main"><div class="load">Chargement des grilles…</div></main>
+
+<script>
+"use strict";
+const PORTES = {
+  "1": {n:"Filles", c:"--p1", s:"Les grilles filles de 4 à 18 ans : un dossier par âge, 3 grilles par âge (préparation physique, geste, déplacement)."},
+  "2": {n:"Garçons", c:"--p2", s:"Les grilles garçons de 4 à 18 ans : un dossier par âge, 3 grilles par âge (préparation physique, geste, déplacement)."},
+  "3": {n:"Tests", c:"--p3", s:"Les 287 fiches de tests : protocole complet et barèmes de tous les âges, filles et garçons."},
+  "4": {n:"Mode d'emploi", c:"--p4", s:"Utiliser les grilles, l'âge biologique, les 4 niveaux, les lignes et les règles d'évaluation."}
+};
+const DOMN = {PP:"Préparation physique", GE:"Biomécanique du geste", DE:"Biomécanique du déplacement"};
+let LIGNES = {};
+
+
+let DOCS = [], BY = {}, NORM = null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fold = s => { let o=""; for(const ch of s){ const d=ch.normalize("NFD")[0]; o += (d||ch).toLowerCase(); } return o; };
+const keyc = c => c.split(".").map(Number);
+
+/* ---------- préférences locales ---------- */
+const ST = "grilles_docs_v1";
+function load(){ try{ return JSON.parse(localStorage.getItem(ST)) || {}; }catch(e){ return {}; } }
+let P = Object.assign({fav:[], rec:[], notes:{}, fs:17, sx:"G", age:"10", dom:"PP", ligne:"0"}, load());
+function save(){ try{ localStorage.setItem(ST, JSON.stringify(P)); }catch(e){} }
+document.documentElement.style.setProperty("--fs", P.fs+"px");
+
+/* ---------- données ---------- */
+async function boot(){
+  try{
+    const r = await fetch("data.json"); const d = await r.json();
+    DOCS = d.docs; LIGNES = d.lignes||{}; X = d.x; DOCS.forEach((x,i)=>{ x.i=i; BY[x.c]=x; });
+  }catch(e){ $("#main").innerHTML = '<div class="empty">Les grilles n\'ont pas pu se charger. Vérifie la connexion pour la première ouverture, puis recharge la page.</div>'; return; }
+  route();
+  setTimeout(buildIndex, 50);
+}
+function buildIndex(){
+  if(NORM) return;
+  const tmp = document.createElement("div");
+  NORM = DOCS.map(x => { tmp.innerHTML = x.h.replace(/></g,"> <"); const t = (x.t+" \n "+tmp.textContent).replace(/\s+/g," "); return {raw:t, f:fold(t)}; });
+}
+
+/* ---------- routage ---------- */
+window.addEventListener("hashchange", route);
+$("#back").onclick = () => { if(history.length > 1) history.back(); else location.hash = ""; };
+function route(){
+  const h = decodeURIComponent(location.hash.slice(1));
+  const m = $("#main"); window.scrollTo(0,0);
+  if(h.startsWith("d/")) return showDoc(h.slice(2).split("/")[0], h.split("/")[2]);
+  if(h.startsWith("p/")) return showPorte(h.slice(2));
+  if(h.startsWith("s/")) { $("#q").value = h.slice(2); return showSearch(h.slice(2)); }
+  if(h==="j") return showJoueurs();
+  if(h.startsWith("j/")) return showJoueur(h.slice(2));
+  showHome();
+}
+function porteOf(x){ return x.p; }
+function colOf(x){ return x.dom ? `var(--${x.dom.toLowerCase()})` : pc(porteOf(x)); }
+const pad2 = n => String(n).padStart(2,"0");
+function pc(p){ return `var(${PORTES[p].c})`; }
+
+/* ---------- accueil ---------- */
+function showHome(){
+  document.documentElement.style.setProperty("--acc", "var(--ink)");
+  const m = $("#main");
+  const count = p => DOCS.filter(x=>porteOf(x)===p).length;
+  let html = `<h1>Grilles et tests</h1><p class="lead">Grilles de compétences 4-18 ans · 90 grilles · 287 tests · niveau 3 = attendu du haut niveau de sa génération</p>`;
+  html += `<div class="sec"><h2>Accès direct</h2><div class="quick">
+    <div class="f"><label for="qs">Sexe</label><select id="qs"><option value="F">Fille</option><option value="G">Garçon</option></select></div>
+    <div class="f"><label for="qa">Âge</label><select id="qa">${Array.from({length:15},(_,i)=>String(i+4)).map(a=>`<option value="${a}">${a} ans</option>`).join("")}</select></div>
+    <div class="f"><label for="qd">Grille</label><select id="qd"><option value="PP">Préparation physique</option><option value="GE">Biomécanique du geste</option><option value="DE">Biomécanique du déplacement</option></select></div>
+    <div class="f" style="flex:1;min-width:200px"><label for="ql">Ligne</label><select id="ql"></select></div>
+    <button class="go" id="qgo" type="button">Ouvrir</button></div></div>`;
+  html += `<div class="sec"><h2>Les portes</h2><div class="doors">${Object.entries(PORTES).map(([p,o])=>`<a class="door" href="#p/${p}" style="--pc:var(${o.c})"><b>${p} · ${o.n}</b><span>${o.s}</span><small>${count(p)} documents</small></a>`).join("")}<a class="door" href="#j" style="--pc:var(--p5)"><b>5 · Joueurs</b><span>Créer un profil, remplir ses grilles, choisir ses tests et saisir ses résultats.</span><small>${JS.joueurs.length} joueur${JS.joueurs.length>1?"s":""}</small></a></div></div>`;
+  const favs = P.fav.filter(c=>BY[c]), recs = P.rec.filter(c=>BY[c]).slice(0,8);
+  html += `<div class="sec"><h2>Favoris</h2>${favs.length ? listHTML(favs.map(c=>BY[c]), true) : '<div class="empty">Touche ☆ en haut d\'une grille ou d\'un test pour le retrouver ici.</div>'}</div>`;
+  if(recs.length) html += `<div class="sec"><h2>Consultés récemment</h2>${listHTML(recs.map(c=>BY[c]), true)}</div>`;
+  html += `<div class="sec"><h2>Mes données</h2><div class="tools">
+     <button class="ib" id="bsave" type="button">Sauvegarder joueurs, favoris et notes</button>
+     <label class="ib" for="frest">Restaurer</label><input id="frest" type="file" accept=".json,application/json" hidden>
+     <button class="ib" id="fsm" type="button" aria-label="Texte plus petit">A−</button><button class="ib" id="fsp" type="button" aria-label="Texte plus grand">A+</button></div><p class="msg" id="dmsg">Joueurs, favoris et notes sont gardés sur cet appareil : sauvegarde régulièrement (Fichiers ou iCloud Drive).</p></div>`;
+  m.innerHTML = html;
+  const qs=$("#qs"), qa=$("#qa"), qd=$("#qd"), ql=$("#ql");
+  qs.value=P.sx; qa.value=P.age; qd.value=P.dom;
+  const fill=()=>{ const L = LIGNES[qd.value]||[]; ql.innerHTML = `<option value="0">Toute la grille</option>`+L.map((n,i)=>`<option value="${i+1}">${i+1} · ${esc(n)}</option>`).join(""); ql.value = +P.ligne <= L.length ? P.ligne : "0"; };
+  fill(); qd.onchange=()=>{ P.ligne="0"; fill(); };
+  $("#qgo").onclick=()=>{ P.sx=qs.value; P.age=qa.value; P.dom=qd.value; P.ligne=ql.value||"0"; save(); location.hash = `d/${qs.value}${pad2(qa.value)}_${qd.value}` + (+ql.value ? `/l${ql.value}` : ""); };
+  $("#bsave").onclick=exportData; $("#frest").onchange=importData;
+  $("#fsm").onclick=()=>setFs(-1); $("#fsp").onclick=()=>setFs(1);
+}
+function setFs(d){ P.fs=Math.max(14,Math.min(24,P.fs+d)); save(); document.documentElement.style.setProperty("--fs",P.fs+"px"); const m=$("#dmsg"); if(m) m.textContent="Taille du texte des documents : "+P.fs+" px."; }
+function listHTML(xs, withPath){
+  return `<div class="list">${xs.map(x=>`<a class="li" href="#d/${x.c}"><span class="code">${x.c}</span><span class="tt">${esc(x.t)}${withPath?`<small>${esc(x.ch)}</small>`:""}</span></a>`).join("")}</div>`;
+}
+
+/* ---------- porte ---------- */
+function showPorte(p){
+  if(!PORTES[p]) return showHome();
+  document.documentElement.style.setProperty("--acc", pc(p));
+  const xs = DOCS.filter(x=>porteOf(x)===p), groups = {};
+  xs.forEach(x=>{ (groups[x.d] = groups[x.d] || []).push(x); });
+  let html = `<div class="crumb" style="--pc:${pc(p)}"><a href="#">Accueil</a></div><h1 style="color:${pc(p)}">${p} · ${PORTES[p].n}</h1><p class="lead">${PORTES[p].s}</p>`;
+  html += Object.entries(groups).map(([d,arr])=>`<div class="fold" style="--pc:${pc(p)}"><h3>${esc(d)}</h3>${listHTML(arr,false)}</div>`).join("");
+  $("#main").innerHTML = html;
+}
+
+/* ---------- document ---------- */
+function showDoc(code, hint){
+  const x = BY[code]; if(!x) return showHome();
+  const p = porteOf(x); document.documentElement.style.setProperty("--acc", colOf(x));
+  P.rec = [code, ...P.rec.filter(c=>c!==code)].slice(0,20); save();
+  const sib = DOCS.filter(y=>y.d===x.d), k = sib.indexOf(x), prev = sib[k-1], next = sib[k+1];
+  const fav = P.fav.includes(code);
+  const m = $("#main"); m.style.setProperty("--pc", colOf(x));
+  m.innerHTML = `<div class="crumb"><a href="#">Accueil</a>›<a href="#p/${p}">${p} · ${PORTES[p].n}</a>›<span>${esc(x.d)}</span></div>
+    <div class="dochead"><h1>${esc(x.t)}</h1><div class="acts">
+      <button class="ib star" id="fav" type="button" aria-pressed="${fav}">${fav?"★ Favori":"☆ Favori"}</button>
+      <button class="ib" id="fsm" type="button" aria-label="Texte plus petit">A−</button><button class="ib" id="fsp" type="button" aria-label="Texte plus grand">A+</button></div></div>
+    <div class="crumb" style="margin-top:4px">${esc(x.ch||"")} · ${x.c}</div>${jumps(x)}
+    <nav class="toc" id="toc" hidden></nav>
+    <article class="doc" id="doc"></article>
+    <div class="pn">${prev?`<a href="#d/${prev.c}"><small>‹ Précédent</small>${esc(prev.t)}</a>`:"<span></span>"}${next?`<a class="nx" href="#d/${next.c}"><small>Suivant ›</small>${esc(next.t)}</a>`:"<span></span>"}</div>
+    <div class="notes"><label for="nt" style="font-weight:600">Mes notes sur ce document</label><textarea id="nt" placeholder="Idées, joueurs concernés, à tester…"></textarea><div class="msg" id="ntm"></div></div>`;
+  // structure : L'essentiel encadré, Le détail en sections dépliables
+  const doc = $("#doc"); const tmp = document.createElement("div"); tmp.innerHTML = x.h;
+  tmp.querySelectorAll("table").forEach(t=>{ const w=document.createElement("div"); w.className="tw"; t.replaceWith(w); w.appendChild(t); });
+  let cur = null, mode = null, sections = [];
+  for(const node of [...tmp.childNodes]){
+    if(node.nodeName==="H2"){
+      const t = fold(node.textContent);
+      if(t.includes("essentiel")){ cur = document.createElement("section"); cur.className="ess"; cur.appendChild(node); doc.appendChild(cur); mode="ess"; continue; }
+      mode = "det"; doc.appendChild(node); cur = doc; continue;
+    }
+    if(node.nodeName==="H3" && mode!=="ess"){
+      const d = document.createElement("details"); const s = document.createElement("summary"); s.textContent = node.textContent; d.appendChild(s);
+      d.id = "s"+sections.length; sections.push([d.id, node.textContent]); doc.appendChild(d); cur = d; continue;
+    }
+    (cur || doc).appendChild(node);
+  }
+  if(sections.length>2){ const toc=$("#toc"); toc.hidden=false; toc.innerHTML = `<b>Le détail</b><ol>${sections.map(([id,t])=>`<li><a href="#" data-s="${id}">${esc(t.replace(/^\d+\.\s*/,""))}</a></li>`).join("")}</ol>`;
+    toc.onclick = e=>{ const a=e.target.closest("a[data-s]"); if(!a) return; e.preventDefault(); const d=document.getElementById(a.dataset.s); d.open=true; d.scrollIntoView({behavior:"smooth",block:"start"}); }; }
+  if(sections.length===1){ doc.querySelector("details").open = true; }
+  // favoris, taille, notes
+  $("#fav").onclick = ()=>{ const on = !P.fav.includes(code); P.fav = on ? [code,...P.fav] : P.fav.filter(c=>c!==code); save(); $("#fav").setAttribute("aria-pressed",on); $("#fav").textContent = on?"★ Favori":"☆ Favori"; };
+  $("#fsm").onclick=()=>setFs(-1); $("#fsp").onclick=()=>setFs(1);
+  const nt=$("#nt"); nt.value = P.notes[code]||""; let tm;
+  nt.oninput = ()=>{ clearTimeout(tm); tm=setTimeout(()=>{ if(nt.value.trim()) P.notes[code]=nt.value; else delete P.notes[code]; save(); $("#ntm").textContent="Note enregistrée sur cet appareil."; },500); };
+  // aller à un âge ou surligner une recherche
+  if(hint && hint.startsWith("l")) goLine(+hint.slice(1));
+  else if(hint && hint.startsWith("b")) goBareme(hint.slice(1));
+  else if(hint && hint.startsWith("q")) highlight(hint.slice(1));
+}
+function jumps(x){
+  const m = /^([FG])(\d\d)_(PP|GE|DE)$/.exec(x.c); if(!m) return "";
+  const [_, sx, a2, dom] = m, a = +a2, o = sx==="F"?"G":"F";
+  const L = LIGNES[dom]||[];
+  return `<div class="jump">${["PP","GE","DE"].map(d=>`<a href="#d/${sx}${a2}_${d}" class="${d===dom?"on":""}">${DOMN[d]}</a>`).join("")}</div>
+  <div class="jump">${a>4?`<a href="#d/${sx}${pad2(a-1)}_${dom}">‹ ${a-1} ans</a>`:""}${a<18?`<a href="#d/${sx}${pad2(a+1)}_${dom}">${a+1} ans ›</a>`:""}<a href="#d/${o}${a2}_${dom}">Même grille · ${o==="F"?"filles":"garçons"}</a></div>
+`;
+}
+document.addEventListener("click", e=>{ const a=e.target.closest(".lines a[data-l]"); if(!a) return; e.preventDefault(); goLine(+a.dataset.l); });
+function goLine(n){
+  const d = [...document.querySelectorAll("#doc details")].find(x=>x.querySelector("summary").textContent.startsWith("Ligne "+n+" ·"));
+  if(!d) return; d.open = true; setTimeout(()=>{ d.scrollIntoView({behavior:"smooth",block:"start"}); d.querySelector("summary").classList.add("flash"); },60);
+}
+function goBareme(k){
+  const tr = document.getElementById("b"+k); if(!tr) return; const d = tr.closest("details"); if(d) d.open = true;
+  setTimeout(()=>{ tr.scrollIntoView({behavior:"smooth",block:"center"}); tr.classList.add("flash"); },60);
+}
+function ageIn(text, age){
+  const t = fold(text); if(!/\ban|ans\b/.test(t)) return false;
+  const nums = (t.match(/\d+/g)||[]).map(Number).filter(n=>n<=25); if(!nums.length) return false;
+  if(/\d+\s*(-|a|à|et)\s*\d+/.test(t) && nums.length>=2){ const lo=Math.min(...nums), hi=Math.max(...nums); return age>=lo && age<=hi; }
+  return nums.includes(age);
+}
+function goAge(age){
+  const doc = $("#doc");
+  let target = [...doc.querySelectorAll("details")].find(d=>ageIn(d.querySelector("summary").textContent, age));
+  if(target){ target.open=true; setTimeout(()=>{ target.scrollIntoView({behavior:"smooth",block:"start"}); target.querySelector("summary").classList.add("flash"); },60); return; }
+  const h = [...doc.querySelectorAll("h4,h5")].find(e=>ageIn(e.textContent, age));
+  if(h){ const d=h.closest("details"); if(d) d.open=true; setTimeout(()=>{ h.scrollIntoView({behavior:"smooth",block:"center"}); h.classList.add("flash"); },60); return; }
+  const td = [...doc.querySelectorAll("td:first-child")].find(e=>ageIn(e.textContent, age));
+  if(td){ const tr=td.parentNode; setTimeout(()=>{ tr.scrollIntoView({behavior:"smooth",block:"center"}); tr.classList.add("flash"); },60); }
+}
+
+/* ---------- recherche ---------- */
+let sT;
+$("#q").addEventListener("input", e=>{ clearTimeout(sT); const v=e.target.value.trim(); sT=setTimeout(()=>{ if(v.length>=2) history.replaceState(null,"","#s/"+encodeURIComponent(v)), showSearch(v); else if(!v && location.hash.startsWith("#s/")) location.hash=""; },250); });
+$("#q").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.target.blur(); } });
+function terms(q){ return fold(q).split(/\s+/).filter(w=>w.length>=2); }
+function showSearch(q){
+  document.documentElement.style.setProperty("--acc", "var(--ink)");
+  buildIndex();
+  const ts = terms(q), m = $("#main");
+  if(!ts.length){ showHome(); return; }
+  const res = [];
+  NORM.forEach((n,i)=>{
+    let score=0, first=-1;
+    for(const t of ts){ let c=0, pos=n.f.indexOf(t); if(pos<0){ score=0; return; } if(first<0||pos<first) first=pos; while(pos>=0 && c<60){ c++; pos=n.f.indexOf(t,pos+t.length); } score+=c; }
+    if(fold(DOCS[i].t).includes(ts[0])) score+=40;
+    res.push({i, score, first});
+  });
+  res.sort((a,b)=>b.score-a.score);
+  const top = res.slice(0,60);
+  let html = `<h1>Recherche</h1><p class="lead">${res.length ? `${res.length} document${res.length>1?"s":""} pour « ${esc(q)} »${res.length>60?" · les 60 plus pertinents":""}` : `Aucun document ne contient « ${esc(q)} ». Essaie un mot plus court ou un synonyme.`}</p><div class="sec">`;
+  html += top.map(r=>{ const x=DOCS[r.i], n=NORM[r.i]; const a=Math.max(0,r.first-90), b=Math.min(n.raw.length,r.first+190);
+    let snip = (a?"…":"")+n.raw.slice(a,b)+(b<n.raw.length?"…":"");
+    snip = markTerms(esc(snip), ts);
+    return `<a class="res" href="#d/${x.c}/q${encodeURIComponent(q)}" style="--pc:${colOf(x)}"><div class="t">${esc(x.t)}</div><div class="w">${x.c} · ${esc(x.ch)}</div><div class="s">${snip}</div></a>`; }).join("");
+  m.innerHTML = html + "</div>";
+}
+function markTerms(htmlText, ts){
+  const f = fold(htmlText); let out="", i=0;
+  const hits=[]; ts.forEach(t=>{ let p=f.indexOf(t); while(p>=0){ hits.push([p,p+t.length]); p=f.indexOf(t,p+t.length); } });
+  hits.sort((a,b)=>a[0]-b[0]); let last=0;
+  for(const [s,e] of hits){ if(s<last) continue; const pre=htmlText.slice(last,s); if(/&[a-z]*$/.test(pre)) continue; out+=pre+"<mark>"+htmlText.slice(s,e)+"</mark>"; last=e; }
+  return out+htmlText.slice(last);
+}
+function highlight(q){
+  const ts = terms(q); if(!ts.length) return; const doc=$("#doc");
+  const walker = document.createTreeWalker(doc, NodeFilter.SHOW_TEXT); const nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
+  let firstMark=null;
+  for(const n of nodes){ const f=fold(n.nodeValue); const hits=[]; ts.forEach(t=>{ let p=f.indexOf(t); while(p>=0){ hits.push([p,p+t.length]); p=f.indexOf(t,p+t.length); } });
+    if(!hits.length) continue; hits.sort((a,b)=>a[0]-b[0]);
+    const frag=document.createDocumentFragment(); let last=0;
+    for(const [s,e] of hits){ if(s<last) continue; frag.append(n.nodeValue.slice(last,s)); const mk=document.createElement("mark"); mk.textContent=n.nodeValue.slice(s,e); frag.append(mk); if(!firstMark) firstMark=mk; last=e; }
+    frag.append(n.nodeValue.slice(last)); n.replaceWith(frag); }
+  doc.querySelectorAll("mark").forEach(mk=>{ const d=mk.closest("details"); if(d) d.open=true; });
+  if(firstMark) setTimeout(()=>firstMark.scrollIntoView({behavior:"smooth",block:"center"}),80);
+}
+
+/* ---------- sauvegarde ---------- */
+async function exportData(){
+  const blob = new Blob([JSON.stringify({format:"grilles-docs", version:1, date:new Date().toISOString().slice(0,10), fav:P.fav, notes:P.notes, joueurs:JS.joueurs}, null, 1)], {type:"application/json"});
+  const name = "Grilles_joueurs_favoris_notes_"+new Date().toISOString().slice(0,10)+".json";
+  let dl=null; try{ dl = await window.claude?.use?.("downloads"); }catch(e){}
+  if(dl){ try{ await dl.save({filename:name, data:blob}); return; }catch(e){ if(e&&e.code==="declined") return; } }
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove();
+}
+async function importData(e){
+  const f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f) return; const m=$("#dmsg");
+  try{ const d=JSON.parse(await f.text()); if(d.format!=="grilles-docs") throw 0;
+    P.fav=[...new Set([...(d.fav||[]),...P.fav])]; P.notes=Object.assign({},P.notes,d.notes||{}); save(); (d.joueurs||[]).forEach(x=>{ if(!x||!x.id||!Array.isArray(x.bilans)) return; const k=JS.joueurs.findIndex(y=>y.id===x.id); if(k>=0) JS.joueurs[k]=x; else JS.joueurs.push(x); }); jsave(); showHome(); $("#dmsg").textContent="Joueurs, favoris et notes restaurés."; }
+  catch(err){ m.textContent="Ce fichier n'est pas une sauvegarde de cette appli (Grilles_joueurs_favoris_notes_….json)."; }
+}
+
+/* ---------- JOUEURS : profils, grilles remplies, tests choisis (gardés sur l'appareil) ---------- */
+const JK = "grilles_joueurs_v1";
+let JS = (()=>{ try{ return JSON.parse(localStorage.getItem(JK)) || {joueurs:[]}; }catch(e){ return {joueurs:[]}; } })();
+if(!Array.isArray(JS.joueurs)) JS = {joueurs:[]};
+function jsave(){ try{ localStorage.setItem(JK, JSON.stringify(JS)); return true; }catch(e){ return false; } }
+let X = null;
+const DOM3 = ["PP","GE","DE"];
+const NVN = {1:"Non acquis",2:"En cours d'acquisition",3:"Acquis",4:"Maîtrisé"};
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const today = () => new Date().toISOString().slice(0,10);
+const frD = s => s ? s.split("-").reverse().join("/") : "";
+const gcode = (sx,age,d) => sx+pad2(age)+"_"+d;
+const fmtN = v => v==null ? "–" : String(v).replace(".",",");
+function ageCiv(nai, ref){ if(!nai) return null; const a=new Date(nai), r=new Date(ref||today()); let y=r.getFullYear()-a.getFullYear(); if(r.getMonth()<a.getMonth()||(r.getMonth()===a.getMonth()&&r.getDate()<a.getDate())) y--; return y; }
+const clampA = a => Math.max(4, Math.min(18, a|0));
+function newB(date, age){ return {id:uid(), date, age, note:"", v:{PP:[],GE:[],DE:[]}, sel:[], res:{}}; }
+const getP = id => JS.joueurs.find(j=>j.id===id);
+const lastB = j => [...j.bilans].sort((a,b)=>a.date<b.date?1:-1)[0];
+function curB(j){ return j.bilans.find(b=>b.id===j.cur) || lastB(j); }
+function parseN(s){ if(s==null) return null; s=String(s).trim().replace(",",".").replace(/\s/g,""); if(s==="") return null; if(/^\d+:\d+(\.\d+)?$/.test(s)){ const [m,x]=s.split(":"); return +m*60 + +x; } const v=parseFloat(s); return isNaN(v)?null:v; }
+function mesuresOf(tid, sx, age){ const s = X.s[tid]?.[sx]?.[age]; return s ? Object.keys(s) : null; }
+function niveau(tid, sx, age, vals){
+  const S = X.s[tid]?.[sx]?.[age]; if(!S || !vals) return null; let lv = 4;
+  for(const k in S){ const v = parseN(vals[k]); if(v==null) return null; const t = S[k];
+    const asc = t[0]<t[2] || (t[0]===t[2] && /grand/.test(X.sens[tid]||""));
+    lv = Math.min(lv, asc ? (v>=t[2]?4:v>=t[1]?3:v>=t[0]?2:1) : (v<=t[2]?4:v<=t[1]?3:v<=t[0]?2:1)); }
+  return lv;
+}
+function lineTestsLevel(j, b, d, i){ const L = X.g[gcode(j.sexe,b.age,d)][i]; if(!L) return null;
+  const lvP = niveau(L.p, j.sexe, b.age, b.res[L.p]); if(lvP) return lvP;
+  const ls = L.t.map(t=>niveau(t, j.sexe, b.age, b.res[t])).filter(Boolean); if(!ls.length) return null;
+  return Math.round(ls.reduce((a,x)=>a+x,0)/ls.length*2)/2; }
+function moy(j, b, d){ const g = X.g[gcode(j.sexe,b.age,d)]; const v = (b.v[d]||[]).filter((x,i)=>x!=null && g[i]); if(!v.length) return null; return Math.round(v.reduce((a,x)=>a+x,0)/v.length*10)/10; }
+function nbLines(j,b,d){ const g = X.g[gcode(j.sexe,b.age,d)]; return [g.filter((L,i)=>L && b.v[d][i]!=null).length, g.filter(Boolean).length]; }
+const lvCls = v => v==null ? "" : "n"+Math.min(4,Math.max(1,Math.floor(v)));
+function radar(d, vals, grey){
+  const n = LIGNES[d].length, R = 80, c = 110, A = i => -Math.PI/2 + i*2*Math.PI/n, P = (i,v) => [c+Math.cos(A(i))*R*v/4, c+Math.sin(A(i))*R*v/4];
+  let s = `<svg viewBox="0 0 220 220" class="rad" aria-hidden="true">`;
+  for(let k=4;k>=1;k--) s += `<polygon points="${[...Array(n)].map((_,i)=>P(i,k).join(",")).join(" ")}" fill="none" stroke="var(--line)" ${k===3?'stroke-dasharray="3 3" stroke="var(--n3)"':""}/>`;
+  if(vals.some(v=>v!=null)) s += `<polygon points="${vals.map((v,i)=>P(i,grey[i]?0:(v||0)).join(",")).join(" ")}" fill="var(--pc)" fill-opacity=".18" stroke="var(--pc)" stroke-width="2"/>`;
+  for(let i=0;i<n;i++){ const [x,y]=P(i,4.9); s += `<text x="${x}" y="${y+4}" text-anchor="middle" font-size="11" font-weight="600" fill="currentColor" opacity="${grey[i]?.35:1}">${i+1}</text>`; }
+  return s+"</svg>";
+}
+
+/* ----- liste ----- */
+function showJoueurs(){
+  document.documentElement.style.setProperty("--acc","var(--p5)");
+  const L = [...JS.joueurs].sort((a,b)=>a.nom.localeCompare(b.nom,"fr"));
+  let h = `<div class="crumb" style="--pc:var(--p5)"><a href="#">Accueil</a></div><h1 style="color:var(--p5)">5 · Joueurs</h1><p class="lead">Un profil par joueur : ses bilans, ses grilles remplies, ses tests et leurs résultats. Tout reste sur cet appareil.</p>`;
+  h += `<div class="sec"><h2>Nouveau joueur</h2><div class="quick">
+    <div class="f" style="flex:1;min-width:180px"><label for="jn">Prénom et nom</label><input id="jn" class="inp" autocomplete="off"></div>
+    <div class="f"><label for="jsx">Sexe</label><select id="jsx"><option value="G">Garçon</option><option value="F">Fille</option></select></div>
+    <div class="f"><label for="jnai">Naissance</label><input id="jnai" class="inp" type="date"></div>
+    <div class="f"><label for="jgr">Groupe</label><input id="jgr" class="inp" placeholder="Comité G1, SPUC…" style="width:150px"></div>
+    <button class="go" id="jadd" type="button">Créer</button></div><p class="msg" id="jmsg"></p></div>`;
+  h += `<div class="sec"><h2>Mes joueurs</h2>${L.length ? `<div class="list">${L.map(j=>{ const b=curB(j); const ac=ageCiv(j.naissance);
+    return `<a class="li" href="#j/${j.id}"><span class="code">${j.sexe==="F"?"Fille":"Garçon"}</span><span class="tt">${esc(j.nom)}<small>${ac!=null?ac+" ans · ":""}${j.groupe?esc(j.groupe)+" · ":""}bilan du ${frD(b.date)}, grille ${b.age} ans · moyennes ${DOM3.map(d=>fmtN(moy(j,b,d))).join(" / ")}</small></span></a>`; }).join("")}</div>` : `<div class="empty">Aucun joueur pour l'instant : crée le premier ci-dessus.</div>`}</div>`;
+  $("#main").innerHTML = h;
+  $("#jadd").onclick = ()=>{ const nom=$("#jn").value.trim(); if(!nom){ $("#jmsg").textContent="Indique le nom du joueur."; return; }
+    const nai=$("#jnai").value; const ac=ageCiv(nai); const j={id:uid(), nom, sexe:$("#jsx").value, naissance:nai, groupe:$("#jgr").value.trim(), notes:"", bilans:[]};
+    const b=newB(today(), ac!=null?clampA(ac):10); j.bilans.push(b); j.cur=b.id; JS.joueurs.push(j); jsave(); location.hash="j/"+j.id; };
+}
+
+/* ----- profil d'un joueur ----- */
+function showJoueur(id){
+  const j = getP(id); if(!j) return showJoueurs();
+  const b = curB(j); const ac = ageCiv(j.naissance, b.date);
+  document.documentElement.style.setProperty("--acc", j.sexe==="F"?"var(--p1)":"var(--p2)");
+  const m = $("#main"); m.style.setProperty("--pc", j.sexe==="F"?"var(--p1)":"var(--p2)");
+  let h = `<div class="crumb"><a href="#">Accueil</a>›<a href="#j">5 · Joueurs</a>›<span>${esc(j.nom)}</span></div>
+  <div class="dochead"><h1>${esc(j.nom)}</h1><div class="acts"><button class="ib" id="jedit" type="button">Modifier</button><button class="ib" id="jdel" type="button">Supprimer</button></div></div>
+  <div class="crumb" style="margin-top:4px">${j.sexe==="F"?"Fille":"Garçon"}${j.naissance?" · née le ".replace("née", j.sexe==="F"?"née":"né")+frD(j.naissance):""}${ac!=null?" · "+ac+" ans au bilan":""}${j.groupe?" · "+esc(j.groupe):""}</div>
+  <div class="quick" id="jform" hidden style="margin-top:10px">
+    <div class="f" style="flex:1;min-width:180px"><label for="en">Prénom et nom</label><input id="en" class="inp" value="${esc(j.nom)}"></div>
+    <div class="f"><label for="esx">Sexe</label><select id="esx"><option value="G" ${j.sexe==="G"?"selected":""}>Garçon</option><option value="F" ${j.sexe==="F"?"selected":""}>Fille</option></select></div>
+    <div class="f"><label for="enai">Naissance</label><input id="enai" class="inp" type="date" value="${esc(j.naissance||"")}"></div>
+    <div class="f"><label for="egr">Groupe</label><input id="egr" class="inp" value="${esc(j.groupe||"")}" style="width:150px"></div>
+    <button class="go" id="esave" type="button">Enregistrer</button></div>
+  <div class="sec"><h2>Bilan</h2><div class="quick">
+    <div class="f" style="flex:1;min-width:200px"><label for="bsel">Bilan affiché</label><select id="bsel">${[...j.bilans].sort((a,c)=>a.date<c.date?1:-1).map(x=>`<option value="${x.id}" ${x.id===b.id?"selected":""}>${frD(x.date)} · grille ${x.age} ans${x.note?" · "+esc(x.note):""}</option>`).join("")}</select></div>
+    <div class="f"><label for="bdate">Date</label><input id="bdate" class="inp" type="date" value="${b.date}"></div>
+    <div class="f"><label for="bage">Grille (âge biologique)</label><select id="bage">${Array.from({length:15},(_,i)=>i+4).map(a=>`<option value="${a}" ${a===b.age?"selected":""}>${a} ans</option>`).join("")}</select></div>
+    <button class="ib" id="bnew" type="button">+ Nouveau bilan</button>${j.bilans.length>1?`<button class="ib" id="bdel" type="button">Supprimer ce bilan</button>`:""}</div>
+    <p class="msg">Grille choisie selon l'âge biologique : âge civil par défaut, un an de plus si nettement en avance de maturation, un an de moins si en retard. Un nouveau bilan reprend la grille et les tests choisis du bilan affiché.</p></div>`;
+  // grilles
+  h += `<div class="sec"><h2>Grilles du bilan</h2><p class="msg" style="margin:-4px 0 8px">Choisis le niveau de chaque ligne (par demi-niveau). Le nom d'une ligne ouvre sa référence complète. La colonne « Tests » donne le niveau calculé à partir des résultats saisis plus bas.</p>`;
+  DOM3.forEach(d=>{ const c=gcode(j.sexe,b.age,d); const g=X.g[c]; const [f,a]=nbLines(j,b,d);
+    h += `<details class="jg" ${S_open(d)?"open":""} data-d="${d}" style="--pc:var(--${d.toLowerCase()})"><summary><span>${DOMN[d]}</span><span class="jm" id="m_${d}">moyenne ${fmtN(moy(j,b,d))} · ${f}/${a} lignes</span></summary>
+      <div class="jgrid"><div class="jrad" id="r_${d}">${radar(d, b.v[d].slice(0,g.length).concat(Array(Math.max(0,g.length-b.v[d].length)).fill(null)), g.map(x=>!x))}</div>
+      <div class="tw"><table class="jt"><thead><tr><th>Ligne</th><th>Niveau</th><th>Tests</th></tr></thead><tbody>${g.map((L,i)=>{ const nm=LIGNES[d][i];
+        if(!L) return `<tr class="off"><td>${i+1} · ${esc(nm)}</td><td colspan="2">non évaluée à cet âge</td></tr>`;
+        const v=b.v[d][i]??null; const tl=lineTestsLevel(j,b,d,i);
+        return `<tr><td><a class="ref" href="#d/${c}/l${i+1}">${i+1} · ${esc(nm)}</a><div class="lvtxt" id="t_${d}_${i}">${v!=null?esc(L.n[Math.floor(v)-1]):""}</div></td>
+        <td><select class="lvsel ${lvCls(v)}" data-d="${d}" data-i="${i}" aria-label="Niveau ligne ${i+1}"><option value="">–</option>${[1,1.5,2,2.5,3,3.5,4].map(x=>`<option value="${x}" ${v===x?"selected":""}>${fmtN(x)}${Number.isInteger(x)?" · "+NVN[x]:""}</option>`).join("")}</select></td>
+        <td class="c" id="tl_${d}_${i}">${tl?`<span class="lvb ${lvCls(tl)}">${fmtN(tl)}</span>`:"–"}</td></tr>`; }).join("")}</tbody></table></div></div></details>`; });
+  h += `</div>`;
+  // tests
+  const pri=[], all=[]; DOM3.forEach(d=>X.g[gcode(j.sexe,b.age,d)].forEach(L=>{ if(!L) return; if(!pri.includes(L.p)) pri.push(L.p); L.t.forEach(t=>{ if(!all.includes(t)) all.push(t); }); }));
+  const sel = b.sel.filter(t=>BY[t]); const done = sel.filter(t=>niveau(t,j.sexe,b.age,b.res[t])).length;
+  h += `<div class="sec"><h2>Tests du bilan</h2><div class="tools"><button class="ib" id="tpri" type="button">★ Ajouter les ${pri.length} tests prioritaires</button><button class="ib" id="tchoose" type="button">Choisir les tests</button>${sel.length?`<button class="ib" id="tclear" type="button">Tout retirer</button>`:""}</div>
+    <p class="msg" style="margin-top:6px">${sel.length?`${done} fait${done>1?"s":""} sur ${sel.length} au programme. Tape le résultat : le niveau se calcule avec le barème ${j.sexe==="F"?"filles":"garçons"} ${b.age} ans. Une ligne encore vide reçoit le niveau de ses tests.`:"Aucun test choisi pour ce bilan."}</p>
+    <div id="tpick" hidden>${DOM3.map(d=>{ const c=gcode(j.sexe,b.age,d); return `<div class="fold" style="--pc:var(--${d.toLowerCase()})"><h3>${DOMN[d]}</h3><div class="list">${X.g[c].map((L,i)=>!L?"":`<div class="pk"><b>${i+1} · ${esc(LIGNES[d][i])}</b>${L.t.map(t=>`<label><input type="checkbox" data-t="${t}" ${b.sel.includes(t)?"checked":""}> ${t===L.p?"★ ":""}${esc(BY[t]?BY[t].t:t)}</label>`).join("")}</div>`).join("")}</div></div>`; }).join("")}</div>`;
+  if(sel.length){
+    const byD = d => sel.filter(t=>t.slice(2,4)===d).sort();
+    h += DOM3.map(d=>{ const ts=byD(d); if(!ts.length) return ""; return `<div class="fold" style="--pc:var(--${d.toLowerCase()})"><h3>${DOMN[d]}</h3><div class="tw"><table class="jt"><thead><tr><th>Test</th><th>Résultat</th><th>Niveau</th></tr></thead><tbody>${ts.map(t=>{
+      const ms = mesuresOf(t,j.sexe,b.age); const r=b.res[t]||{}; const lv=niveau(t,j.sexe,b.age,r); const pr = pri.includes(t);
+      return `<tr><td>${pr?"★ ":""}<a class="ref" href="#d/${t}/b${j.sexe}${b.age}">${esc(BY[t].t)}</a><div class="lvtxt">${t} · ${esc(X.u[t]||"")}</div><div class="lvtxt" id="bt_${t}">${lv?esc(X.bt[t][j.sexe][b.age][lv]):""}</div></td>
+      <td>${ms?ms.map(k=>`<label class="ms">${esc(k)}<input class="inp" inputmode="decimal" autocomplete="off" data-t="${t}" data-k="${esc(k)}" value="${esc(r[k]??"")}"></label>`).join(""):`<span class="msg">pas de barème à ${b.age} ans</span>`}</td>
+      <td class="c" id="lv_${t}">${lv?`<span class="lvb ${lvCls(lv)}">${lv}</span>`:"–"}</td></tr>`; }).join("")}</tbody></table></div></div>`; }).join("");
+  }
+  h += `</div><div class="notes"><label for="bnote" style="font-weight:600">Notes du bilan</label><textarea id="bnote" placeholder="Observations, priorités de travail, contexte…">${esc(b.note||"")}</textarea><div class="msg" id="bnm"></div></div>`;
+  m.innerHTML = h;
+  bindJoueur(j, b);
+}
+const OPEN = {}; function S_open(d){ return OPEN[d]!==false; }
+function bindJoueur(j, b){
+  const re = ()=>{ const y=scrollY; showJoueur(j.id); scrollTo(0,y); };
+  $("#jedit").onclick = ()=>{ $("#jform").hidden = !$("#jform").hidden; };
+  $("#esave").onclick = ()=>{ const n=$("#en").value.trim(); if(n) j.nom=n; j.sexe=$("#esx").value; j.naissance=$("#enai").value; j.groupe=$("#egr").value.trim(); jsave(); re(); };
+  const del=$("#jdel"); del.onclick = ()=>{ if(!del.dataset.ok){ del.dataset.ok=1; del.textContent="Toucher encore pour supprimer"; setTimeout(()=>{ if(del.isConnected){ delete del.dataset.ok; del.textContent="Supprimer"; } },4000); return; } JS.joueurs=JS.joueurs.filter(x=>x!==j); jsave(); location.hash="j"; };
+  $("#bsel").onchange = e=>{ j.cur=e.target.value; jsave(); re(); };
+  $("#bdate").onchange = e=>{ if(e.target.value){ b.date=e.target.value; jsave(); re(); } };
+  $("#bage").onchange = e=>{ b.age=+e.target.value; jsave(); re(); };
+  $("#bnew").onclick = ()=>{ const ac=ageCiv(j.naissance); const nb=newB(today(), b.age); nb.sel=[...b.sel]; if(ac!=null && ac>b.age) nb.age=clampA(ac); j.bilans.push(nb); j.cur=nb.id; jsave(); re(); };
+  const bd=$("#bdel"); if(bd) bd.onclick = ()=>{ if(!bd.dataset.ok){ bd.dataset.ok=1; bd.textContent="Toucher encore pour supprimer"; setTimeout(()=>{ if(bd.isConnected){ delete bd.dataset.ok; bd.textContent="Supprimer ce bilan"; } },4000); return; } j.bilans=j.bilans.filter(x=>x!==b); j.cur=lastB(j).id; jsave(); re(); };
+  document.querySelectorAll("details.jg").forEach(x=>x.addEventListener("toggle",()=>{ OPEN[x.dataset.d]=x.open; }));
+  document.querySelectorAll(".lvsel").forEach(s=>s.onchange = ()=>{ const d=s.dataset.d, i=+s.dataset.i; b.v[d][i] = s.value===""?null:+s.value; if(b.auto) delete b.auto[d+i]; jsave(); refreshDom(j,b,d); });
+  const pri=[]; DOM3.forEach(d=>X.g[gcode(j.sexe,b.age,d)].forEach(L=>{ if(L&&!pri.includes(L.p)) pri.push(L.p); }));
+  $("#tpri").onclick = ()=>{ b.sel=[...new Set([...b.sel,...pri])]; jsave(); re(); };
+  $("#tchoose").onclick = ()=>{ $("#tpick").hidden = !$("#tpick").hidden; $("#tchoose").textContent = $("#tpick").hidden ? "Choisir les tests" : "Fermer et mettre à jour"; if($("#tpick").hidden) re(); };
+  document.querySelectorAll("#tpick input[type=checkbox]").forEach(c=>c.onchange = ()=>{ const t=c.dataset.t; b.sel = c.checked ? [...new Set([...b.sel,t])] : b.sel.filter(x=>x!==t); jsave(); });
+  const tc=$("#tclear"); if(tc) tc.onclick = ()=>{ if(!tc.dataset.ok){ tc.dataset.ok=1; tc.textContent="Toucher encore pour tout retirer"; return; } b.sel=[]; jsave(); re(); };
+  document.querySelectorAll("input[data-t][data-k]").forEach(inp=>inp.oninput = ()=>{ const t=inp.dataset.t, k=inp.dataset.k; b.res[t]=b.res[t]||{}; if(inp.value.trim()==="") delete b.res[t][k]; else b.res[t][k]=inp.value.trim();
+    const lv=niveau(t,j.sexe,b.age,b.res[t]); $("#lv_"+CSS.escape(t)).innerHTML = lv?`<span class="lvb ${lvCls(lv)}">${lv}</span>`:"–"; $("#bt_"+CSS.escape(t)).textContent = lv?X.bt[t][j.sexe][b.age][lv]:"";
+    const d=t.slice(2,4); const g=X.g[gcode(j.sexe,b.age,d)];
+    g.forEach((L,i)=>{ if(!L||!L.t.includes(t)) return; const tl=lineTestsLevel(j,b,d,i); const cell=$(`#tl_${d}_${i}`); if(cell) cell.innerHTML = tl?`<span class="lvb ${lvCls(tl)}">${fmtN(tl)}</span>`:"–";
+      if(tl && (b.v[d][i]==null || (b.auto&&b.auto[d+i]))){ b.v[d][i]=tl; b.auto=b.auto||{}; b.auto[d+i]=1; const s=document.querySelector(`.lvsel[data-d="${d}"][data-i="${i}"]`); if(s) s.value=String(tl); } });
+    jsave(); refreshDom(j,b,d); });
+  let tm; $("#bnote").oninput = e=>{ clearTimeout(tm); tm=setTimeout(()=>{ b.note=e.target.value; jsave(); $("#bnm").textContent="Note enregistrée sur cet appareil."; },400); };
+}
+function refreshDom(j,b,d){ const g=X.g[gcode(j.sexe,b.age,d)]; const [f,a]=nbLines(j,b,d);
+  $("#m_"+d).textContent = `moyenne ${fmtN(moy(j,b,d))} · ${f}/${a} lignes`;
+  $("#r_"+d).innerHTML = radar(d, g.map((x,i)=>b.v[d][i]??null), g.map(x=>!x));
+  g.forEach((L,i)=>{ if(!L) return; const v=b.v[d][i]??null; const s=document.querySelector(`.lvsel[data-d="${d}"][data-i="${i}"]`); if(s){ s.className="lvsel "+lvCls(v); if(b.auto&&b.auto[d+i]===undefined){} } const t=$(`#t_${d}_${i}`); if(t) t.textContent = v!=null?L.n[Math.floor(v)-1]:""; });
+}
+
+boot();
+</script>
+<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}</script></body></html>
